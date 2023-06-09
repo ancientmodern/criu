@@ -56,7 +56,8 @@ install: lib-c lib-a lib-py crit/crit lib/c/criu.pc.in
 	$(Q) install -m 644 lib/c/criu.pc $(DESTDIR)$(LIBDIR)/pkgconfig
 ifeq ($(PYTHON),python3)
 	$(E) "  INSTALL " crit
-	$(Q) $(PYTHON) -m pip install --upgrade --force-reinstall --prefix=$(DESTDIR)$(PREFIX) ./crit
+    # $(Q) $(PYTHON) -m pip install --upgrade --force-reinstall --prefix=$(DESTDIR)$(PREFIX) ./crit
+	$(Q) /tools/foss/python/3.10.4-20220329T150106Z/x86_64/ubuntu.22.04/bin/python3 -m pip install --upgrade --force-reinstall --prefix=$(DESTDIR)$(PREFIX) ./crit
 endif
 .PHONY: install
 
@@ -71,6 +72,7 @@ uninstall:
 	$(Q) $(RM) $(addprefix $(DESTDIR)$(LIBDIR)/pkgconfig/,criu.pc)
 ifeq ($(PYTHON),python3)
 	$(E) " UNINSTALL" crit
-	$(Q) $(PYTHON) ./scripts/uninstall_module.py --prefix=$(DESTDIR)$(PREFIX) crit
+    # $(Q) $(PYTHON) -m pip install --upgrade --force-reinstall --prefix=$(DESTDIR)$(PREFIX) ./crit
+	$(Q) /tools/foss/python/3.10.4-20220329T150106Z/x86_64/ubuntu.22.04/bin/python3 -m pip install --upgrade --force-reinstall --prefix=$(DESTDIR)$(PREFIX) ./crit
 endif
 .PHONY: uninstall
