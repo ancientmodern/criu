@@ -5,13 +5,11 @@ TOOLCHAIN_ROOT="/rivos/riscv-gnu-toolchain"
 
 # the path that contains cross compiling toolchain binaries, e.g., riscv64-unknown-linux-gnu-gcc, riscv64-unknown-linux-gnu-ld
 TOOLCHAIN_PATH="$TOOLCHAIN_ROOT/bin" 
-# TOOLCHAIN_PATH="usr/bin"
 
 TARGET_ARCH="riscv64"
-# TARGET_ARCH="aarch64"
 
 # the root directory that contains CRIU's source code
-CRIU_ROOT_DIR="/scratch/yixue-criu"
+CRIU_ROOT_DIR="/scratch/rivos/criu"
 
 # the root directory that will contain the cross compiled artifacts (initially empty)
 # e.g., the RISC-V binaries of protobuf (CRIU's required package)
