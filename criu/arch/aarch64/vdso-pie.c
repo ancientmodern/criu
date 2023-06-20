@@ -17,6 +17,8 @@ int vdso_redirect_calls(unsigned long base_to, unsigned long base_from, struct v
 {
 	unsigned int i;
 
+	pr_msg("~Arm64~ Executing function: %s in file: %s\n", __func__, __FILE__);
+
 	for (i = 0; i < ARRAY_SIZE(to->symbols); i++) {
 		if (vdso_symbol_empty(&from->symbols[i]))
 			continue;

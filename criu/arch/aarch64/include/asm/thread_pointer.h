@@ -19,8 +19,11 @@
 #ifndef _SYS_THREAD_POINTER_H
 #define _SYS_THREAD_POINTER_H
 
+#include "log.h"
+
 static inline void *__criu_thread_pointer(void)
 {
+   pr_msg("~Arm64~ Executing function: %s in file: %s\n", __func__, __FILE__);
 	return __builtin_thread_pointer();
 }
 

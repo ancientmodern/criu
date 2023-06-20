@@ -10,5 +10,6 @@
 
 int restore_nonsigframe_gpregs(UserRegsEntry *r)
 {
+	pr_msg("~Arm64~ Executing function: %s in file: %s\n", __func__, __FILE__);
 	return 0;
 }

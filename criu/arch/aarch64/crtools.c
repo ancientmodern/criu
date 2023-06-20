@@ -28,6 +28,8 @@ int save_task_regs(void *x, user_regs_struct_t *regs, user_fpregs_struct_t *fpsi
 	int i;
 	CoreEntry *core = x;
 
+	pr_msg("~Arm64~ Executing function: %s in file: %s\n", __func__, __FILE__);
+
 	// Save the Aarch64 CPU state
 	for (i = 0; i < 31; ++i)
 		assign_reg(core->ti_aarch64->gpregs, regs, regs[i]);
@@ -51,6 +53,8 @@ int arch_alloc_thread_info(CoreEntry *core)
 	ThreadInfoAarch64 *ti_aarch64;
 	UserAarch64RegsEntry *gpregs;
 	UserAarch64FpsimdContextEntry *fpsimd;
+
+	pr_msg("~Arm64~ Executing function: %s in file: %s\n", __func__, __FILE__);
 
 	ti_aarch64 = xmalloc(sizeof(*ti_aarch64));
 	if (!ti_aarch64)
@@ -87,6 +91,8 @@ err:
 
 void arch_free_thread_info(CoreEntry *core)
 {
+	pr_msg("~Arm64~ Executing function: %s in file: %s\n", __func__, __FILE__);
+
 	if (CORE_THREAD_ARCH_INFO(core)) {
 		if (CORE_THREAD_ARCH_INFO(core)->fpsimd) {
 			xfree(CORE_THREAD_ARCH_INFO(core)->fpsimd->vregs);
@@ -103,6 +109,8 @@ int restore_fpu(struct rt_sigframe *sigframe, CoreEntry *core)
 {
 	int i;
 	struct fpsimd_context *fpsimd = RT_SIGFRAME_FPU(sigframe);
+
+	pr_msg("~Arm64~ Executing function: %s in file: %s\n", __func__, __FILE__);
 
 	if (core->ti_aarch64->fpsimd->n_vregs != 64)
 		return 1;
@@ -132,6 +140,8 @@ int restore_gpregs(struct rt_sigframe *f, UserRegsEntry *r)
 	CPREG1(pstate);
 
 #undef CPREG1
+
+	pr_msg("~Arm64~ Executing function: %s in file: %s\n", __func__, __FILE__);
 
 	return 0;
 }

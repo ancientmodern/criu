@@ -5,6 +5,8 @@
 #include "common/compiler.h"
 #include "asm-generic/vdso.h"
 
+#include "log.h"
+
 /*
  * This is a minimal amount of symbols
  * we should support at the moment.

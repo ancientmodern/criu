@@ -10,6 +10,8 @@
 #include "bitops.h"
 #include "asm/int.h"
 
+#include "log.h"
+
 #include <compel/plugins/std/asm/syscall-types.h>
 
 #define core_is_compat(core) false
@@ -26,10 +28,12 @@ typedef UserAarch64RegsEntry UserRegsEntry;
 
 static inline void *decode_pointer(uint64_t v)
 {
+	pr_msg("~Arm64~ Executing function: %s in file: %s\n", __func__, __FILE__);
 	return (void *)v;
 }
 static inline uint64_t encode_pointer(void *p)
 {
+	pr_msg("~Arm64~ Executing function: %s in file: %s\n", __func__, __FILE__);
 	return (uint64_t)p;
 }
 
