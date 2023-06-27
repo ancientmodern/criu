@@ -8,7 +8,7 @@
 #include <compel/asm/fpu.h>
 #include "cpu.h"
 
-int restore_nonsigframe_gpregs(UserRegsEntry *r)
+int restore_nonsigframe_gpregs(UserRiscv64RegsEntry *r)
 {
 	return 0;
 }

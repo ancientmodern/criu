@@ -14,15 +14,15 @@
 
 #define core_is_compat(core) false
 
-typedef UserAarch64RegsEntry UserRegsEntry;
+typedef UserRiscv64RegsEntry UserRegsEntry;
 
-#define CORE_ENTRY__MARCH CORE_ENTRY__MARCH__AARCH64
+#define CORE_ENTRY__MARCH CORE_ENTRY__MARCH__RISCV64
 
-#define CORE_THREAD_ARCH_INFO(core) core->ti_aarch64
+#define CORE_THREAD_ARCH_INFO(core) core->ti_riscv64
 
-#define TI_SP(core) ((core)->ti_aarch64->gpregs->sp)
+#define TI_SP(core) ((core)->ti_riscv64->gpregs->sp)
 
-#define TI_IP(core) ((core)->ti_aarch64->gpregs->pc)
+#define TI_IP(core) ((core)->ti_riscv64->gpregs->pc)
 
 static inline void *decode_pointer(uint64_t v)
 {

@@ -123,6 +123,7 @@ message core_entry {
 		PPC64		= 4;
 		S390		= 5;
 		MIPS		= 6;
+		RISCV64		= 7;
 	}
 
 	required march			mtype		= 1;

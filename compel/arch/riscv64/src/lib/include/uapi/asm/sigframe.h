@@ -32,14 +32,6 @@
 #include <compel/sigframe-common.h>
 
 /* Copied from the kernel source arch/riscv/kernel/signal.c */
-// struct rt_sigframe {
-// 	siginfo_t info;
-// 	ucontext_t uc;
-// #ifndef CONFIG_MMU
-// 	u32 sigreturn_code[2];
-// #endif
-// };
-
 struct rt_sigframe {
 	siginfo_t info;
 	ucontext_t uc; //ucontext_t structure holds the user context, e.g., the signal mask, GP regs

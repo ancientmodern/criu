@@ -14,7 +14,6 @@ CRIU_ROOT_DIR="/scratch/rivos/criu"
 # the root directory that will contain the cross compiled artifacts (initially empty)
 # e.g., the RISC-V binaries of protobuf (CRIU's required package)
 BUILD_ROOT_DIR="/scratch/cross-compile-riscv64-artifacts"
-# BUILD_ROOT_DIR="/home/yixue/cross-compile-arm64-artifacts"
 mkdir -p $BUILD_ROOT_DIR
 
 # no need to change it, unless you changed the build scripts for CRIU's dependencies (e.g., build_protobuf.sh)

@@ -117,8 +117,8 @@
 
 #define arch_map_vdso(map, compat) -1
 
-int restore_gpregs(struct rt_sigframe *f, UserAarch64RegsEntry *r);
-int restore_nonsigframe_gpregs(UserAarch64RegsEntry *r);
+int restore_gpregs(struct rt_sigframe *f, UserRiscv64RegsEntry *r);
+int restore_nonsigframe_gpregs(UserRiscv64RegsEntry *r);
 
 static inline void restore_tls(tls_t *ptls)
 {
