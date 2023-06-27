@@ -22,6 +22,9 @@ const char code_syscall[] = {
     0x73, 0x00, 0x10, 0x00  /* ebreak */
 };
 
+// #define NT_RISCV_CAUSE 0xb00
+// #define EXC_SYSCALL 8
+
 static const int code_syscall_aligned = round_up(sizeof(code_syscall), sizeof(long));
 
 static inline void __always_unused __check_code_syscall(void)
@@ -141,31 +144,41 @@ void print_user_fpregs_struct(user_fpregs_struct_t *fpregs) {
 int compel_get_task_regs(pid_t pid, user_regs_struct_t *regs, user_fpregs_struct_t *ext_regs, save_regs_t save,
 			 void *arg, __maybe_unused unsigned long flags)
 {
-	user_fpregs_struct_t tmp, *fpsimd = ext_regs ? ext_regs : &tmp; // checks if ext_regs pointer is provided. If not, tmp is used as a temporary storage for the FP registers
-	struct iovec iov; //iovec is io vector struct defined in Linux
-	int ret;
+	user_fpregs_struct_t tmp, *fpsimd = ext_regs ? ext_regs : &tmp;
+	struct iovec iov;
+	int ret = -1;
 
 	pr_info("~RISCV64~ Executing function: %s in file: %s\n", __func__, __FILE__);
-	pr_info("Dumping GP/FPU registers for %d\n", pid);
-
-	iov.iov_base = regs;
-	iov.iov_len = sizeof(user_regs_struct_t);
-	if ((ret = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &iov))) {
-		pr_perror("Failed to obtain CPU registers for %d", pid);
-		goto err;
-	}
+	pr_info("Dumping FPU registers for %d\n", pid);
 
 	iov.iov_base = fpsimd;
 	iov.iov_len = sizeof(*fpsimd);
 	if ((ret = ptrace(PTRACE_GETREGSET, pid, NT_PRFPREG, &iov))) {
 		pr_perror("Failed to obtain FPU registers for %d", pid);
-		goto err;
+		return -1;
 	}
-	print_user_regs_struct(regs);
-	print_user_fpregs_struct(fpsimd);
+
+	/* Restart the system call */
+	if (regs->a7) {
+		pr_info("~RISCV~ Enter EXC_SYSCALL: a7 = %ld, a0 = %ld, orig_a0 = %ld\n", regs->a7, regs->a0, regs->orig_a0);
+		/* Restart the system call - no handlers present */
+		switch (regs->a0) {
+		case -ERESTARTNOHAND:
+		case -ERESTARTSYS:
+			pr_info("~RISCV~ %s:%d:%s: Meet -ERESTARTSYS", __FILE__, __LINE__, __func__);
+		case -ERESTARTNOINTR:
+            regs->a0 = regs->orig_a0;
+			regs->pc -= 0x4;
+			break;
+		case -ERESTART_RESTARTBLOCK:
+            regs->a0 = regs->orig_a0;
+			regs->a7 = __NR_restart_syscall;
+			regs->pc -= 0x4;
+			break;
+		}
+	}
+
 	ret = save(arg, regs, fpsimd);
-	pr_info("compel_get_task_regs ret: %d\n", ret);
-err:
 	return ret;
 }
 
@@ -286,27 +299,31 @@ unsigned long compel_task_size(void)
 }
 
 /*
+ * Get task registers (overwrites weak function)
+ */
+int ptrace_get_regs(int pid, user_regs_struct_t *regs)
+{
+	struct iovec iov;
+
+	pr_info("~RISCV64~ Executing function: %s in file: %s\n", __func__, __FILE__);
+	pr_debug("ptrace_get_regs: pid=%d\n", pid);
+
+	iov.iov_base = regs;
+	iov.iov_len = sizeof(user_regs_struct_t);
+	return ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &iov);
+}
+
+/*
  * Set task registers (overwrites weak function)
  */
 int ptrace_set_regs(int pid, user_regs_struct_t *regs)
 {
 	struct iovec iov;
-	int ret;
 
 	pr_info("~RISCV64~ Executing function: %s in file: %s\n", __func__, __FILE__);
 	pr_debug("ptrace_set_regs: pid=%d\n", pid);
 
 	iov.iov_base = regs;
 	iov.iov_len = sizeof(user_regs_struct_t);
-	// pr_debug("GP registers BEFORE ptrace PTRACE_SETREGSET\n");
-	// print_user_regs_struct(regs);
-	ret = ptrace(PTRACE_SETREGSET, pid, NT_PRSTATUS, &iov);
-	pr_debug("return value after ptrace in ptrace_set_regs: %d\n", ret);
-	// if ((ret = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &iov))) {
-	// 	pr_perror("Failed to obtain CPU registers for %d", pid);
-	// 	return ret;
-	// }
-	// pr_debug("GP registers AFTER ptrace PTRACE_SETREGSET\n");
-	// print_user_regs_struct(regs);
-	return ret;
+	return ptrace(PTRACE_SETREGSET, pid, NT_PRSTATUS, &iov);
 }

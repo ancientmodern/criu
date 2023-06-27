@@ -1768,12 +1768,15 @@ int compel_stop_pie(pid_t pid, void *addr, bool no_bp)
 	int ret;
 
 	pr_info("Executing function: %s in file: %s\n", __func__, __FILE__);
+	pr_info("compel_stop_pie: pid: %d, addr: %p, no_bp: %d\n", pid, addr, no_bp);
 
 	if (no_bp) {
 		pr_debug("Force no-breakpoints restore\n");
 		ret = 0;
-	} else
+	} else {
 		ret = ptrace_set_breakpoint(pid, addr);
+		pr_debug("ptrace_set_breakpoint returned: %d\n", ret);
+	}
 	if (ret < 0)
 		return ret;
 
@@ -1852,6 +1855,8 @@ int compel_stop_on_syscall(int tasks, const int sys_nr, const int sys_nr_compat)
 			pr_perror("wait4 failed");
 			return -1;
 		}
+
+		pr_info("wait4 returns %d\n", pid);
 
 		if (!task_is_trapped(status, pid))
 			return -1;
