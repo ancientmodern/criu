@@ -9,19 +9,19 @@
 #define JUMP_TO_RESTORER_BLOB(new_sp, restore_task_exec_start,	\
 			      task_args)			\
 	asm volatile(						\
-			"and  sp, %0, #~15		\n"	\
-			"mov  x0, %2			\n"	\
-			"br   %1			\n"	\
+			"and  sp, %0, ~15		\n"	\
+			"mv  a0, %2			\n"	\
+			"j   %1 			\n"	\
 			:					\
 			: "r"(new_sp),				\
 			  "r"(restore_task_exec_start),		\
 			  "r"(task_args)			\
-			: "x0", "memory")
+			: "a0", "memory")
 /* clang-format on */
 
 static inline void core_get_tls(CoreEntry *pcore, tls_t *ptls)
 {
-	*ptls = pcore->ti_aarch64->tls;
+	*ptls = pcore->ti_riscv64->tls;
 }
 
 int restore_fpu(struct rt_sigframe *sigframe, CoreEntry *core);

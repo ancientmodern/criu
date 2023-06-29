@@ -82,6 +82,7 @@ endif
 
 ifeq ($(ARCH),riscv64)
         DEFINES		:= -DCONFIG_RISCV64
+#		USERCFLAGS  += -fPIC
 endif
 
 #

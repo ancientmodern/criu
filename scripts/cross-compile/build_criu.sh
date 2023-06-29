@@ -22,13 +22,14 @@ if [ -f "$file" ] ; then
 fi
 
 
-CFLAGS=$(pkg-config --cflags libprotobuf-c)
-CFLAGS+=" -I$INCLUDE_DIR_CC -L$LIB_DIR_CC -DCONFIG_HAS_NO_LIBC_RSEQ_DEFS"
+# CFLAGS=$(pkg-config --cflags libprotobuf-c)
+CFLAGS=" -I$INCLUDE_DIR_CC -L$LIB_DIR_CC -DCONFIG_HAS_NO_LIBC_RSEQ_DEFS"
 
 
-LDFLAGS=$(pkg-config --libs libprotobuf-c)
-# LDFLAGS+=" -rpath $TOOLCHAIN_LIB_DIR"
-LDFLAGS+=" -Wl,-rpath,/rivos/riscv-gnu-toolchain/sysroot/lib"
+# LDFLAGS=$(pkg-config --libs libprotobuf-c)
+LDFLAGS=" -Wl,-rpath-link,/rivos/riscv-gnu-toolchain/sysroot/lib"
+LDFLAGS+=" -Wl,-rpath-link,/scratch/riscv-gnu-toolchain/build-glibc-linux-rv64imafdc-lp64d"
+
 
 # V=1 \
 ARCH=riscv64 \

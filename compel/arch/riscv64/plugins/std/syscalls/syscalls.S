@@ -106,4 +106,7 @@ syscall sys_clone3, __NR_clone3
 syscall sys_pidfd_open, __NR_pidfd_open
 syscall sys_pidfd_getfd, __NR_pidfd_getfd
 syscall sys_rseq, __NR_rseq
+syscall sys_move_mount, __NR_move_mount
+syscall sys_open_tree, __NR_open_tree
+syscall sys_openat2, __NR_openat2
 #include <compel/plugins/std/syscall-aux.S>
