@@ -69,10 +69,20 @@ stdenv.mkDerivation rec {
     "PREFIX=$(out)"
     "ASCIIDOC=${buildPackages.asciidoc}/bin/asciidoc"
     "XMLTO=${buildPackages.xmlto}/bin/xmlto"
+    "DEBUG=1"
   ] ++ (lib.optionals (stdenv.buildPlatform != stdenv.targetPlatform) [
     "ARCH=${linuxArchMapping."${stdenv.targetPlatform.linuxArch}"}"
     "CROSS_COMPILE=${stdenv.targetPlatform.config}-"
   ]);
+
+  installTargets = [
+    "install-criu"
+    "compel"
+    "install-man"
+  ];
+
+  postInstall = ''
+  '';
 
   outputs = [ "out" "dev" "man" ];
 

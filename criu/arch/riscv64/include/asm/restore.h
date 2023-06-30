@@ -11,7 +11,7 @@
 	asm volatile(						\
 			"and  sp, %0, ~15		\n"	\
 			"mv  a0, %2			\n"	\
-			"j   %1 			\n"	\
+			"jr   %1 			\n"	\
 			:					\
 			: "r"(new_sp),				\
 			  "r"(restore_task_exec_start),		\

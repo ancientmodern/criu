@@ -99,9 +99,9 @@ static inline int atomic_cmpxchg(atomic_t *ptr, int old, int new)
 
 	asm volatile("1:\n"
 		     "  lr.w %1, %2\n"
-		     "  bne %1, %3, 2\n"
+		     "  bne %1, %3, 2f\n"
 		     "  sc.w %0, %4, %2\n"
-		     "  bnez %0, 1\n"
+		     "  bnez %0, 1b\n"
 		     "2:"
 		     : "=&r"(tmp), "=&r"(oldval), "+A"(ptr->counter)
 		     : "r"(old), "r"(new)
