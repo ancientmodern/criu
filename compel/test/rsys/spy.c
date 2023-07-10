@@ -69,14 +69,13 @@ static inline int chk(int fd, int val)
 {
 	int v = 0;
 	ssize_t ret;
-	
+
 	ret = read(fd, &v, sizeof(v));
-	
-	if(ret == -1){
+
+	if (ret == -1) {
 		perror("read failed");
 		exit(EXIT_FAILURE);
-	}
-	else if(ret != sizeof(v)){
+	} else if (ret != sizeof(v)) {
 		printf("read did not read expected number of bytes: %zu\n", ret);
 		exit(EXIT_FAILURE);
 	}
@@ -115,7 +114,8 @@ int main(int argc, char **argv)
 		// dup2(p_err[1], 2); // redirects the child's standard error to write to the pipe p_err
 		close(p_err[1]);
 		// freopen("child_errors.txt", "w", stderr);
-		execl("./victim", "victim", NULL); // replace the current process image with a new process image (running ./vimtim instead)
+		execl("./victim", "victim",
+		      NULL); // replace the current process image with a new process image (running ./vimtim instead)
 		exit(1);
 	}
 
@@ -136,10 +136,11 @@ int main(int argc, char **argv)
 	}
 
 	printf("Checking the victim session to be %d\n", sid);
-	pass = chk(p_out[0], sid); // p_out[0] is read end of p_out, parent reads from p_out[0], child writes to p_out[1]
+	pass = chk(p_out[0],
+		   sid); // p_out[0] is read end of p_out, parent reads from p_out[0], child writes to p_out[1]
 	if (!pass)
 		return 1;
-	
+
 	/*
 	 * Now do the infection with parasite.c
 	 */
@@ -154,7 +155,8 @@ int main(int argc, char **argv)
 	end_sec = tv.tv_sec;
 	end_usec = tv.tv_usec;
 	printf("Finished do_rsetsid() at Seconds: %ld Microseconds: %ld\n", end_sec, end_usec);
-	printf("Time spent in do_rsetsid(): Seconds: %ld Microseconds: %ld\n", (end_sec - start_sec), (end_usec - start_usec));
+	printf("Time spent in do_rsetsid(): Seconds: %ld Microseconds: %ld\n", (end_sec - start_sec),
+	       (end_usec - start_usec));
 	/*
 	 * Kick the victim again so it tells new session
 	 */
@@ -172,7 +174,7 @@ int main(int argc, char **argv)
 	printf("Waiting for victim to die\n");
 	wait(&status); // wait for child to exit
 	if (WIFEXITED(status)) {
-    printf("Child exited with status %d\n", WEXITSTATUS(status));
+		printf("Child exited with status %d\n", WEXITSTATUS(status));
 	} else if (WIFSIGNALED(status)) {
 		printf("Child killed by signal %d\n", WTERMSIG(status));
 	} else if (WIFSTOPPED(status)) {

@@ -9,7 +9,7 @@ typedef rt_signalfn_t *rt_sighandler_t;
 typedef void rt_restorefn_t(void);
 typedef rt_restorefn_t *rt_sigrestore_t;
 
-#define _KNSIG	  64 // number of signals 
+#define _KNSIG	  64 // number of signals
 #define _NSIG_BPW 64 // number of signals per word
 
 #define _KNSIG_WORDS (_KNSIG / _NSIG_BPW)

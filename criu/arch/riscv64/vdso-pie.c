@@ -30,20 +30,19 @@ static inline void invalidate_caches(void)
 	// We're supposed to use the VDSO as the officially sanctioned ABI. But
 	// oh well.
 	int ret;
-    __smp_mb();
-	asm volatile(
-		"li a0, 0\n"
-		"li a1, 0\n"
-		"li a2, 1\n"   /* SYS_RISCV_FLUSH_ICACHE_ALL */
-		"li a7, 259\n" /* __NR_arch_specific_syscall */
-		"ecall\n"
-		: "=r"(ret)
-		: 
-		: "a7"
-	);
+	__smp_mb();
+	asm volatile("li a0, 0\n"
+		     "li a1, 0\n"
+		     "li a2, 1\n"   /* SYS_RISCV_FLUSH_ICACHE_ALL */
+		     "li a7, 259\n" /* __NR_arch_specific_syscall */
+		     "ecall\n"
+		     : "=r"(ret)
+		     :
+		     : "a7");
 }
 
-static inline size_t vdso_trampoline_size(void) {
+static inline size_t vdso_trampoline_size(void)
+{
 	return (size_t)&riscv_vdso_lookup_end - (size_t)&riscv_vdso_lookup;
 }
 
@@ -133,8 +132,8 @@ static inline void put_trampoline_call(uint64_t from, uint64_t to, uint64_t tram
 	lookup_table[idx] = to;
 }
 
-int vdso_redirect_calls(uint64_t base_to, uint64_t base_from, struct vdso_symtable *to,
-			struct vdso_symtable *from, bool __always_unused compat_vdso)
+int vdso_redirect_calls(uint64_t base_to, uint64_t base_from, struct vdso_symtable *to, struct vdso_symtable *from,
+			bool __always_unused compat_vdso)
 {
 	unsigned int i, valid_idx = 0;
 
@@ -146,11 +145,11 @@ int vdso_redirect_calls(uint64_t base_to, uint64_t base_from, struct vdso_symtab
 		if (vdso_symbol_empty(&from->symbols[i]))
 			continue;
 
-
 		pr_debug("br: %lx/%lx -> %lx/%lx (index %d) '%s'\n", base_from, from->symbols[i].offset, base_to,
 			 to->symbols[i].offset, i, from->symbols[i].name);
 
-		put_trampoline_call(base_from + from->symbols[i].offset, base_to + to->symbols[i].offset, trampoline, valid_idx);
+		put_trampoline_call(base_from + from->symbols[i].offset, base_to + to->symbols[i].offset, trampoline,
+				    valid_idx);
 		valid_idx++;
 	}
 

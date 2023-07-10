@@ -17,15 +17,16 @@
  * Workaround for VDSO array symbol table's relocation.
  * XXX: remove when compel/piegen will support riscv64.
  */
-#define ARCH_VDSO_SYMBOLS_LIST                                     \
+#define ARCH_VDSO_SYMBOLS_LIST                                  \
 	const char *rv64_vdso_symbol1 = "__vdso_clock_getres";  \
 	const char *rv64_vdso_symbol2 = "__vdso_clock_gettime"; \
 	const char *rv64_vdso_symbol3 = "__vdso_gettimeofday";  \
-	const char *rv64_vdso_symbol4 = "__vdso_getcpu";  \
+	const char *rv64_vdso_symbol4 = "__vdso_getcpu";        \
 	const char *rv64_vdso_symbol5 = "__vdso_flush_icache";  \
 	const char *rv64_vdso_symbol6 = "__vdso_rt_sigreturn";
 
-#define ARCH_VDSO_SYMBOLS rv64_vdso_symbol1, rv64_vdso_symbol2, rv64_vdso_symbol3, rv64_vdso_symbol4, rv64_vdso_symbol5, rv64_vdso_symbol6
+#define ARCH_VDSO_SYMBOLS \
+	rv64_vdso_symbol1, rv64_vdso_symbol2, rv64_vdso_symbol3, rv64_vdso_symbol4, rv64_vdso_symbol5, rv64_vdso_symbol6
 
 extern void write_intraprocedure_branch(unsigned long to, unsigned long from);
 

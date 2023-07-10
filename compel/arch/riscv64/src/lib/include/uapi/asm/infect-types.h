@@ -30,11 +30,11 @@ typedef struct __riscv_d_ext_state user_fpregs_struct_t;
 #define compel_arch_get_tls_task(ctl, tls)
 #define compel_arch_get_tls_thread(tctl, tls)
 
-#define REG_RES(registers)	  ((uint64_t)(registers).a0)
-#define REG_IP(registers)	  ((uint64_t)(registers).pc)
+#define REG_RES(registers)	   ((uint64_t)(registers).a0)
+#define REG_IP(registers)	   ((uint64_t)(registers).pc)
 #define SET_REG_IP(registers, val) ((registers).pc = (val))
 
-#define REG_GET_SP(registers)	  ((uint64_t)((registers).sp))
+#define REG_GET_SP(registers) ((uint64_t)((registers).sp))
 
 #define REG_SYSCALL_NR(registers) ((uint64_t)(registers).a7)
 

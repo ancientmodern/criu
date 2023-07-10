@@ -8,13 +8,13 @@
 
 #define GLOBAL(name) \
 	.globl name; \
-	name:
+name:
 
 #define ENTRY(name)            \
 	.globl name;           \
 	.type name, @function; \
 	__ALIGN;               \
-	name:
+name:
 
 #define END(sym) .size sym, .- sym
 
