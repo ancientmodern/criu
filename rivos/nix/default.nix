@@ -82,6 +82,8 @@ stdenv.mkDerivation rec {
   ];
 
   postInstall = ''
+    make ${lib.concatStringsSep " " makeFlags} zdtm
+    cp -r test $out/
   '';
 
   outputs = [ "out" "dev" "man" ];
