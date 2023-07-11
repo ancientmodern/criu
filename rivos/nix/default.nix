@@ -4,6 +4,7 @@
 { stdenv, lib, fetchFromGitHub, fetchpatch, protobuf, protobufc, asciidoc, iptables
 , xmlto, docbook_xsl, libpaper, libnl, libcap, libnet, pkg-config, iproute2
 , which, python3, makeWrapper, docbook_xml_dtd_45, perl, nftables, libbsd
+, libaio
 , buildPackages
 , src
 , version
@@ -35,6 +36,7 @@ stdenv.mkDerivation rec {
     libnet
     nftables
     libbsd
+    libaio
   ];
   propagatedBuildInputs = [
     protobufc
