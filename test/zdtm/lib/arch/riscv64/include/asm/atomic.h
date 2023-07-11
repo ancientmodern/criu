@@ -1,9 +1,7 @@
 #ifndef __CR_ATOMIC_H__
 #define __CR_ATOMIC_H__
 
-typedef struct {
-	int counter;
-} atomic_t;
+typedef uint32_t atomic_t;
 
 /* Copied from the Linux header arch/riscv/include/asm/barrier.h */
 
@@ -40,12 +38,12 @@ typedef struct {
 
 static inline int atomic_read(const atomic_t *v)
 {
-	return (*(volatile int *)&(v)->counter);
+	return (*(volatile int *)v);
 }
 
 static inline void atomic_set(atomic_t *v, int i)
 {
-	v->counter = i;
+	*v = i;
 }
 
 #define atomic_get atomic_read
@@ -54,7 +52,7 @@ static inline int atomic_add_return(int i, atomic_t *v)
 {
 	int result;
 
-	asm volatile("amoadd.w.aqrl %1, %2, %0" : "+A"(v->counter), "=r"(result) : "r"(i) : "memory");
+	asm volatile("amoadd.w.aqrl %1, %2, %0" : "+A"(*v), "=r"(result) : "r"(i) : "memory");
 	__smp_mb();
 	return result + i;
 }
@@ -98,7 +96,7 @@ static inline int atomic_cmpxchg(atomic_t *ptr, int old, int new)
 		     "  sc.w %0, %4, %2\n"
 		     "  bnez %0, 1b\n"
 		     "2:"
-		     : "=&r"(tmp), "=&r"(oldval), "+A"(ptr->counter)
+		     : "=&r"(tmp), "=&r"(oldval), "+A"(*ptr)
 		     : "r"(old), "r"(new)
 		     : "memory");
 
