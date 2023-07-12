@@ -10,6 +10,9 @@
 , version
 }:
 
+let
+  myPythonEnv = python3.withPackages (ps: with ps; [ pyyaml protobuf ]);
+in
 stdenv.mkDerivation rec {
   pname = "criu";
   inherit src version;
@@ -30,6 +33,7 @@ stdenv.mkDerivation rec {
     perl
   ];
   buildInputs = [
+    myPythonEnv
     protobuf
     libnl
     libcap
@@ -85,7 +89,8 @@ stdenv.mkDerivation rec {
 
   postInstall = ''
     make ${lib.concatStringsSep " " makeFlags} zdtm
-    cp -r test $out/
+    mkdir -p $out/criu
+    cp -r . $out/criu
   '';
 
   outputs = [ "out" "dev" "man" ];

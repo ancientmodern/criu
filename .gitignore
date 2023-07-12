@@ -44,3 +44,4 @@ include/common/config.h
 build/**
 *.DS_Store
 .vscode
+result*
