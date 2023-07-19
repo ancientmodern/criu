@@ -1,22 +1,29 @@
 COPY scripts/ci/apt-install /bin/apt-install
 
-RUN apt-install \
-	gnupg2 wget
+RUN apt-get clean -y && apt-get update -y && apt-get install -y gnupg2 --no-install-recommends
 
 # Add the cross compiler sources
-RUN wget --no-check-certificate -O - https://www.ports.debian.org/archive_2023.key | apt-key add -
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 871920D1991BC93C 8D69674688B6CB36 B523E5F3FC4E5F2C
 
-RUN echo "deb http://deb.debian.org/debian stable main" >> /etc/apt/sources.list && \
-	echo "deb http://deb.debian.org/debian-ports sid main" >> /etc/apt/sources.list && \
-	dpkg --add-architecture ${DEBIAN_ARCH}
+# RUN echo "deb [arch=amd64,riscv64] http://deb.debian.org/debian stable main" >> /etc/apt/sources.list && \
+# 	echo "deb [arch=amd64,riscv64] http://deb.debian.org/debian-ports sid main" >> /etc/apt/sources.list && \
+# 	dpkg --add-architecture ${DEBIAN_ARCH}
 
-RUN cat /etc/apt/sources.list
+COPY scripts/ci/amd64-sources.list /etc/apt/sources.list
 
-RUN apt-install \
-	gcc-riscv64-linux-gnu:native \
-	g++-riscv64-linux-gnu:native \
-	dpkg-cross:native \
-	libc6:${DEBIAN_ARCH}=2.37-5 \
+COPY scripts/ci/riscv64-sources.list /etc/apt/sources.list.d/
+
+RUN cat /etc/apt/sources.list && \
+	cat /etc/apt/sources.list.d/riscv64-sources.list && \
+	dpkg --add-architecture ${DEBIAN_ARCH} && \
+	apt-get clean -y && \
+	apt-get update -y
+
+RUN apt-cache policy libbz2-1.0:riscv64 libbz2-dev:riscv64 && \
+	cat /var/lib/dpkg/arch
+
+RUN apt-get install -y --no-install-recommends \
+	crossbuild-essential-${DEBIAN_ARCH}	\
 	libc6-dev-${DEBIAN_ARCH}-cross		\
 	libc6-${DEBIAN_ARCH}-cross		\
 	libbz2-dev:${DEBIAN_ARCH}		\
@@ -34,20 +41,26 @@ RUN apt-install \
 	libaio-dev:${DEBIAN_ARCH}		\
 	libnl-route-3-dev:${DEBIAN_ARCH}
 
-ENV CROSS_COMPILE=${CROSS_TRIPLET}-				\
-	CROSS_ROOT=/usr/${CROSS_TRIPLET}			\
-	AS=/usr/bin/${CROSS_TRIPLET}-as				\
-	AR=/usr/bin/${CROSS_TRIPLET}-ar				\
-	CC=/usr/bin/${CROSS_TRIPLET}-gcc			\
-	CPP=/usr/bin/${CROSS_TRIPLET}-cpp			\
-	CXX=/usr/bin/${CROSS_TRIPLET}-g++			\
-	LD=/usr/bin/${CROSS_TRIPLET}-ld				\
-	FC=/usr/bin/${CROSS_TRIPLET}-gfortran
+# gcc-riscv64-linux-gnu:native \
+# g++-riscv64-linux-gnu:native \
+# dpkg-cross:native \
 
-ENV PATH="${PATH}:${CROSS_ROOT}/bin"				\
-	PKG_CONFIG_PATH=/usr/lib/${CROSS_TRIPLET}/pkgconfig
+RUN ls /usr/bin/*riscv*
 
-COPY . /criu
-WORKDIR /criu
+# ENV CROSS_COMPILE=${CROSS_TRIPLET}-				\
+# 	CROSS_ROOT=/usr/${CROSS_TRIPLET}			\
+# 	AS=/usr/bin/${CROSS_TRIPLET}-as				\
+# 	AR=/usr/bin/${CROSS_TRIPLET}-ar				\
+# 	CC=/usr/bin/${CROSS_TRIPLET}-gcc			\
+# 	CPP=/usr/bin/${CROSS_TRIPLET}-cpp			\
+# 	CXX=/usr/bin/${CROSS_TRIPLET}-g++			\
+# 	LD=/usr/bin/${CROSS_TRIPLET}-ld				\
+# 	FC=/usr/bin/${CROSS_TRIPLET}-gfortran
 
-RUN	make mrproper && date && make -j $(nproc) zdtm && date
+# ENV PATH="${PATH}:${CROSS_ROOT}/bin"				\
+# 	PKG_CONFIG_PATH=/usr/lib/${CROSS_TRIPLET}/pkgconfig
+
+# COPY . /criu
+# WORKDIR /criu
+
+# RUN	make mrproper && date && make -j $(nproc) zdtm && date

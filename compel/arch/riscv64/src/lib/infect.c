@@ -161,25 +161,25 @@ int compel_get_task_regs(pid_t pid, user_regs_struct_t *regs, user_fpregs_struct
 	}
 
 	/* Restart the system call */
-	if (regs->a7) {
-		pr_info("~RISCV~ Enter EXC_SYSCALL: a7 = %ld, a0 = %ld, orig_a0 = %ld\n", regs->a7, regs->a0,
-			regs->orig_a0);
-		/* Restart the system call - no handlers present */
-		switch (regs->a0) {
-		case -ERESTARTNOHAND:
-		case -ERESTARTSYS:
-			pr_info("~RISCV~ %s:%d:%s: Meet -ERESTARTSYS", __FILE__, __LINE__, __func__);
-		case -ERESTARTNOINTR:
-			regs->a0 = regs->orig_a0;
-			regs->pc -= 0x4;
-			break;
-		case -ERESTART_RESTARTBLOCK:
-			regs->a0 = regs->orig_a0;
-			regs->a7 = __NR_restart_syscall;
-			regs->pc -= 0x4;
-			break;
-		}
-	}
+	// if (regs->a7) {
+	// 	pr_info("~RISCV~ Enter EXC_SYSCALL: a7 = %ld, a0 = %ld, orig_a0 = %ld\n", regs->a7, regs->a0,
+	// 		regs->orig_a0);
+	// 	/* Restart the system call - no handlers present */
+	// 	switch (regs->a0) {
+	// 	case -ERESTARTNOHAND:
+	// 	case -ERESTARTSYS:
+	// 		pr_info("~RISCV~ %s:%d:%s: Meet -ERESTARTSYS", __FILE__, __LINE__, __func__);
+	// 	case -ERESTARTNOINTR:
+	// 		regs->a0 = regs->orig_a0;
+	// 		regs->pc -= 0x4;
+	// 		break;
+	// 	case -ERESTART_RESTARTBLOCK:
+	// 		regs->a0 = regs->orig_a0;
+	// 		regs->a7 = __NR_restart_syscall;
+	// 		regs->pc -= 0x4;
+	// 		break;
+	// 	}
+	// }
 
 	ret = save(arg, regs, fpsimd);
 	return ret;

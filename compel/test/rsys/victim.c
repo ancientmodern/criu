@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 			tv.tv_usec);
 		if (count == 2) {
 			fprintf(stderr, "\033[1;31m Victim is sleeping for 1s now\n\033[0m");
-			sleep(1);
+			// sleep(1);
 		}
 		errno = 0;
 		num_bytes = read(0, &i, sizeof(i));
