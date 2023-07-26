@@ -850,7 +850,7 @@ static int dump_sit(NetDeviceEntry *nde, struct cr_imgset *imgset, struct nlattr
 		memcpy(&rl_prefix, nla_data(data[IFLA_IPTUN_6RD_RELAY_PREFIX]), sizeof(rl_prefix));
 		se.n_relay_prefix = 1;
 		se.relay_prefix = &rl_prefix;
-	skip:;
+skip:;
 	}
 
 #undef ENCODE_ENTRY
@@ -929,7 +929,7 @@ static int dump_one_link(struct nlmsghdr *hdr, struct ns_id *ns, void *arg)
 		ret = dump_one_sit(ifi, kind, tb, ns, fds);
 		break;
 	default:
-	unk:
+unk:
 		ret = dump_unknown_device(ifi, kind, tb, ns, fds);
 		break;
 	}
@@ -1073,7 +1073,7 @@ static int dump_nf_ct(struct cr_imgset *fds, int type)
 	} req;
 	int sk, ret;
 
-	pr_info("Dumping netns links\n");
+	pr_info("Dumping netns links in dump_nf_ct\n");
 
 	ret = sk = socket(AF_NETLINK, SOCK_RAW, NETLINK_NETFILTER);
 	if (sk < 0) {
@@ -1120,7 +1120,7 @@ static int list_links(int rtsk, void *args)
 		struct rtgenmsg g;
 	} req;
 
-	pr_info("Dumping netns links\n");
+	pr_info("Dumping netns links in list_links\n");
 
 	memset(&req, 0, sizeof(req));
 	req.nlh.nlmsg_len = sizeof(req);
@@ -1140,7 +1140,7 @@ static int dump_links(int rtsk, struct ns_id *ns, struct cr_imgset *fds)
 		struct rtgenmsg g;
 	} req;
 
-	pr_info("Dumping netns links\n");
+	pr_info("Dumping netns links in dump_links\n");
 
 	memset(&req, 0, sizeof(req));
 	req.nlh.nlmsg_len = sizeof(req);
@@ -1728,7 +1728,7 @@ static int sit_link_info(struct ns_id *ns, struct net_link *link, struct newlink
 		aux = se->relay_prefixlen;
 		addattr_l(&req->h, sizeof(*req), IFLA_IPTUN_6RD_RELAY_PREFIXLEN, &aux, sizeof(u16));
 		addattr_l(&req->h, sizeof(*req), IFLA_IPTUN_6RD_RELAY_PREFIX, se->relay_prefix, sizeof(u32));
-	skip:;
+skip:;
 	}
 
 #undef DECODE_ENTRY
@@ -3730,7 +3730,7 @@ static int check_link_nsid(int rtsk, void *args)
 		struct rtgenmsg g;
 	} req;
 
-	pr_info("Dumping netns links\n");
+	pr_info("Dumping netns links in check_link_nsid\n");
 
 	memset(&req, 0, sizeof(req));
 	req.nlh.nlmsg_len = sizeof(req);
