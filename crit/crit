@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import coredump
+from pycriu import cli
 
 if __name__ == '__main__':
-    coredump.main()
+        cli.main()

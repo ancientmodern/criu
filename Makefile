@@ -19,7 +19,7 @@ endif
 
 #
 # Supported Architectures
-ifneq ($(filter-out x86 arm aarch64 ppc64 s390 mips riscv64,$(ARCH)),)
+ifneq ($(filter-out x86 arm aarch64 ppc64 s390 mips loongarch64 riscv64,$(ARCH)),)
         $(error "The architecture $(ARCH) isn't supported")
 endif
 
@@ -80,9 +80,12 @@ ifeq ($(ARCH),mips)
         DEFINES		:= -DCONFIG_MIPS
 endif
 
+ifeq ($(ARCH),loongarch64)
+        DEFINES		:= -DCONFIG_LOONGARCH64
+endif
+
 ifeq ($(ARCH),riscv64)
         DEFINES		:= -DCONFIG_RISCV64
-#		USERCFLAGS  += -fPIC
 endif
 
 #
@@ -127,6 +130,10 @@ ifeq ($(ARCH),mips)
 WARNINGS		:= -rdynamic
 endif
 
+ifeq ($(ARCH),loongarch64)
+WARNINGS		:= -Wno-implicit-function-declaration
+endif
+
 ifneq ($(GCOV),)
         LDFLAGS         += -lgcov
         CFLAGS          += $(CFLAGS-GCOV)
@@ -161,7 +168,7 @@ HOSTCFLAGS		+= $(WARNINGS) $(DEFINES) -iquote include/
 export AFLAGS CFLAGS USERCLFAGS HOSTCFLAGS
 
 # Default target
-all: flog criu lib crit
+all: flog criu lib
 .PHONY: all
 
 #
@@ -273,26 +280,19 @@ criu: $(criu-deps)
 	$(Q) $(MAKE) $(build)=criu all
 .PHONY: criu
 
-crit/Makefile: ;
-crit/%: criu .FORCE
-	$(Q) $(MAKE) $(build)=crit $@
-crit: criu
-	$(Q) $(MAKE) $(build)=crit all
-.PHONY: crit
-
 unittest: $(criu-deps)
 	$(Q) $(MAKE) $(build)=criu unittest
 .PHONY: unittest
 
 
 #
-# Libraries next once crit it ready
+# Libraries next once criu is ready
 # (we might generate headers and such
 # when building criu itself).
 lib/Makefile: ;
-lib/%: crit .FORCE
+lib/%: criu .FORCE
 	$(Q) $(MAKE) $(build)=lib $@
-lib: crit
+lib: criu
 	$(Q) $(MAKE) $(build)=lib all
 .PHONY: lib
 
@@ -305,7 +305,6 @@ clean mrproper:
 	$(Q) $(MAKE) $(build)=compel $@
 	$(Q) $(MAKE) $(build)=compel/plugins $@
 	$(Q) $(MAKE) $(build)=lib $@
-	$(Q) $(MAKE) $(build)=crit $@
 .PHONY: clean mrproper
 
 clean-amdgpu_plugin:
@@ -446,7 +445,7 @@ lint:
 	flake8 --config=scripts/flake8.cfg test/others/criu-ns/run.py
 	flake8 --config=scripts/flake8.cfg crit/setup.py
 	flake8 --config=scripts/flake8.cfg scripts/uninstall_module.py
-	flake8 --config=scripts/flake8.cfg coredump/
+	flake8 --config=scripts/flake8.cfg coredump/ coredump/coredump
 	shellcheck --version
 	shellcheck scripts/*.sh
 	shellcheck scripts/ci/*.sh scripts/ci/apt-install

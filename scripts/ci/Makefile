@@ -102,5 +102,18 @@ vagrant-fedora-non-root: setup-vagrant
 
 .PHONY: setup-vagrant vagrant-fedora-no-vdso vagrant-fedora-rawhide vagrant-fedora-non-root
 
+check-commit:
+	($(MAKE) -j $$(nproc) -C ../.. && \
+		echo "Commit $$(git rev-parse --short HEAD) built successfully") || \
+		(echo "Build failed for $$(git rev-list -n 1 --pretty HEAD)" && \
+		exit 1)
+
+.PHONY: check-commit
+
+loongarch64-qemu-test:
+	./loongarch64-qemu-test.sh
+
+.PHONY: loongarch64-qemu-test
+
 %:
 	$(MAKE) -C ../build $@$(target-suffix)

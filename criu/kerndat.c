@@ -1574,17 +1574,10 @@ static int kerndat_has_nftables_concat(void)
 #define IPV6_FREEBIND 78
 #endif
 
-static int kerndat_has_ipv6_freebind(void)
+static int __kerndat_has_ipv6_freebind(int sk)
 {
-	int sk, val;
+	int val = 1;
 
-	sk = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-	if (sk == -1) {
-		pr_perror("Unable to create a ipv6 dgram socket");
-		return -1;
-	}
-
-	val = 1;
 	if (setsockopt(sk, SOL_IPV6, IPV6_FREEBIND, &val, sizeof(int)) == -1) {
 		if (errno == ENOPROTOOPT) {
 			kdat.has_ipv6_freebind = false;
@@ -1596,6 +1589,26 @@ static int kerndat_has_ipv6_freebind(void)
 
 	kdat.has_ipv6_freebind = true;
 	return 0;
+}
+
+static int kerndat_has_ipv6_freebind(void)
+{
+	int sk, ret;
+
+	if (!kdat.ipv6) {
+		kdat.has_ipv6_freebind = false;
+		return 0;
+	}
+
+	sk = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+	if (sk == -1) {
+		pr_perror("Unable to create a ipv6 dgram socket");
+		return -1;
+	}
+
+	ret = __kerndat_has_ipv6_freebind(sk);
+	close(sk);
+	return ret;
 }
 
 /*

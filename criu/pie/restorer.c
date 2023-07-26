@@ -51,6 +51,11 @@
 #include "shmem.h"
 #include "restorer.h"
 
+/*
+ * sys_getgroups() buffer size. Not too much, to avoid stack overflow.
+ */
+#define MAX_GETGROUPS_CHECKED (512 / sizeof(unsigned int))
+
 #ifndef PR_SET_PDEATHSIG
 #define PR_SET_PDEATHSIG 1
 #endif
@@ -191,20 +196,39 @@ static int restore_creds(struct thread_creds_args *args, int procfd, int lsm_typ
 	int b, i, ret;
 	struct cap_header hdr;
 	struct cap_data data[_LINUX_CAPABILITY_U32S_3];
-
-	/*
-	 * We're still root here and thus can do it without failures.
-	 */
+	int ruid, euid, suid, fsuid;
+	int rgid, egid, sgid, fsgid;
 
 	/*
 	 * Setup supplementary group IDs early.
 	 */
 	if (args->groups) {
-		ret = sys_setgroups(ce->n_groups, args->groups);
-		if (ret) {
-			pr_err("Can't setup supplementary group IDs: %d\n", ret);
-			return -1;
+		/*
+		 * We may be in an unprivileged user namespace where setgroups
+		 * is disabled.  If the current list of groups is already what
+		 * we want, skip the call to setgroups.
+		 */
+		unsigned int gids[MAX_GETGROUPS_CHECKED];
+		int n = sys_getgroups(MAX_GETGROUPS_CHECKED, gids);
+		if (n != ce->n_groups || memcmp(gids, args->groups, n * sizeof(*gids))) {
+			ret = sys_setgroups(ce->n_groups, args->groups);
+			if (ret) {
+				pr_err("Can't setgroups([%zu gids]): %d\n", ce->n_groups, ret);
+				return -1;
+			}
 		}
+	}
+
+	/*
+	 * Compare xids with current values. If all match then we can skip
+	 * setting them (which requires extra capabilities).
+	 */
+	fsuid = sys_setfsuid(-1);
+	fsgid = sys_setfsgid(-1);
+	if (sys_getresuid(&ruid, &euid, &suid) == 0 && sys_getresgid(&rgid, &egid, &sgid) == 0 && ruid == ce->uid &&
+	    euid == ce->euid && suid == ce->suid && rgid == ce->gid && egid == ce->egid && sgid == ce->sgid &&
+	    fsuid == ce->fsuid && fsgid == ce->fsgid) {
+		goto skip_xids;
 	}
 
 	/*
@@ -250,12 +274,13 @@ static int restore_creds(struct thread_creds_args *args, int procfd, int lsm_typ
 		return -1;
 	}
 
+skip_xids:
 	/*
 	 * Third -- restore securebits. We don't need them in any
 	 * special state any longer.
 	 */
 
-	if (!uid) {
+	if (sys_prctl(PR_GET_SECUREBITS, 0, 0, 0, 0) != ce->secbits) {
 		ret = sys_prctl(PR_SET_SECUREBITS, ce->secbits, 0, 0, 0);
 		if (ret) {
 			pr_err("Unable to set PR_SET_SECUREBITS: %d\n", ret);

@@ -33,7 +33,7 @@ lib-y			+= arch/$(ARCH)/src/lib/thread_area.o
 endif
 
 # handle_elf() has no support of ELF relocations on ARM and RISCV64 (yet?)
-ifneq ($(filter arm aarch64 riscv64,$(ARCH)),)
+ifneq ($(filter arm aarch64 loongarch64 riscv64,$(ARCH)),)
 CFLAGS			+= -DNO_RELOCS
 HOSTCFLAGS		+= -DNO_RELOCS
 endif
