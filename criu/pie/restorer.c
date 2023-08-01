@@ -301,10 +301,18 @@ skip_xids:
 				/* already set */
 				continue;
 			ret = sys_prctl(PR_CAPBSET_DROP, i + b * 32, 0, 0, 0);
-			if (ret) {
+			if (!ret)
+				continue;
+			if (!ce->has_no_new_privs || !ce->no_new_privs || args->cap_prm[b] & (1 << i)) {
 				pr_err("Unable to drop capability %d: %d\n", i + b * 32, ret);
 				return -1;
 			}
+			/*
+			 * If prctl(NO_NEW_PRIVS) is going to be set then it
+			 * will prevent inheriting the capabilities not in
+			 * the permitted set.
+			 */
+			pr_warn("Unable to drop capability %d from bset: %d (but NO_NEW_PRIVS will drop it)\n", i + b * 32, ret);
 		}
 	}
 
@@ -344,6 +352,14 @@ skip_xids:
 	/* Also set the sockcreate label for all threads */
 	if (lsm_set_label(args->lsm_sockcreate, "sockcreate", procfd) < 0)
 		return -1;
+
+	if (ce->has_no_new_privs && ce->no_new_privs) {
+		ret = sys_prctl(PR_SET_NO_NEW_PRIVS, ce->no_new_privs, 0, 0, 0);
+		if (ret) {
+			pr_err("Unable to set no_new_privs=%d: %d\n", ce->no_new_privs, ret);
+			return -1;
+		}
+	}
 
 	return 0;
 }
