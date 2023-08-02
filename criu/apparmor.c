@@ -536,6 +536,8 @@ static int write_aa_policy(AaNamespace *ns, char *path, int offset, char *rewrit
 	}
 
 	my_offset = snprintf(path + offset, PATH_MAX - offset, "/namespaces/%s", ns->name);
+	pr_info("The path after snprintf namespaces: %s\n", path);
+	pr_info("offset = %d, myoffset = %d, PATH_MAX = %d\n", offset, my_offset, PATH_MAX);
 	if (my_offset < 0 || my_offset >= PATH_MAX - offset) {
 		pr_err("snprintf'd too many characters\n");
 		return -1;
@@ -552,6 +554,8 @@ static int write_aa_policy(AaNamespace *ns, char *path, int offset, char *rewrit
 	}
 
 	ret = snprintf(path + offset + my_offset, sizeof(path) - offset - my_offset, "/.replace");
+	pr_info("The path after snprintf replace: %s\n", path);
+	pr_info("offset = %d, myoffset = %d, sizeof(path) = %lu, ret = %d\n", offset, my_offset, sizeof(path), ret);
 	if (ret < 0 || ret >= sizeof(path) - offset - my_offset) {
 		pr_err("snprintf failed\n");
 		goto fail;
@@ -565,6 +569,8 @@ static int write_aa_policy(AaNamespace *ns, char *path, int offset, char *rewrit
 
 		fd = open(path, O_WRONLY);
 		if (fd < 0) {
+			pr_info("The path after open: %s\n", path);
+			pr_info("i = %d, ns->n_policies = %lu\n", i, ns->n_policies);
 			pr_perror("couldn't open apparmor load file %s", path);
 			goto fail;
 		}
